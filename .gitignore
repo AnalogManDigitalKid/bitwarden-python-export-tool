@@ -1,0 +1,11 @@
+# Real config holds secrets - only the .example file belongs in git
+bitwarden-config.toml
+
+# Backup output and runtime data
+exports/
+logs/
+bw-cli-data/
+
+# Python
+__pycache__/
+*.pyc
