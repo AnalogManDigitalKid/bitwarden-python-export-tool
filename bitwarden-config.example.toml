@@ -1,0 +1,87 @@
+# ============================================================
+# Bitwarden backup configuration (example)
+#
+# 1. Copy this file to bitwarden-config.toml (same folder as the script)
+# 2. Fill in your values
+# 3. Keep the real file ONLY on encrypted storage (e.g. a VeraCrypt
+#    container). It holds master passwords in plain text.
+#    Never commit it; .gitignore already excludes it.
+#
+# Strings in 'single quotes' are taken literally (no escaping needed),
+# which is the safest choice for passwords. If a password itself contains
+# a single quote, use '''triple single quotes''' instead.
+# ============================================================
+
+
+# ---------------- Paths ----------------
+# Relative paths are relative to the script's folder, so the drive letter
+# doesn't matter. Absolute paths (e.g. 'D:\Backups\Bitwarden') also work.
+
+output_dir   = 'exports'        # each run creates exports\<yyyy-MM-dd_HHmm>\<vault name>\
+log_dir      = 'logs'           # one log file per run
+cli_data_dir = 'bw-cli-data'    # bw's working data; deleted at the end of every run
+
+
+# ---------------- Optional ----------------
+
+# Full path to the Bitwarden CLI, if 'bw' isn't on your PATH.
+# bw_path = 'C:\Tools\bw.exe'
+
+# Server to use. Omit for the default US cloud (https://vault.bitwarden.com).
+# server = 'https://vault.bitwarden.eu'        # EU cloud
+# server = 'https://bitwarden.example.com'     # self-hosted / Vaultwarden
+
+
+# ---------------- Vaults ----------------
+# Add one [[vault]] block per account to back up.
+#
+# client_id / client_secret: personal API key from the Bitwarden web vault,
+#   Settings > Security > Keys > View API key.
+#   The client_id looks like 'user.xxxxxxxx-...'.
+# master_password: needed to decrypt the vault (the API key only logs in).
+#
+# Each vault has one or more [[vault.export]] blocks:
+#   type                = 'personal' or 'organization'
+#   organization_id     = required for type 'organization'
+#                         (find it with: bw list organizations)
+#   unencrypted         = plain JSON export (readable by anyone with the file)
+#   encrypted           = password-protected JSON export (importable into any
+#                         Bitwarden account with encryption_password)
+#   encryption_password = required when encrypted = true
+#   attachments         = download file attachments
+
+[[vault]]
+name            = 'Personal'
+client_id       = 'user.00000000-0000-0000-0000-000000000000'
+client_secret   = 'your-client-secret'
+master_password = 'your-master-password'
+
+  [[vault.export]]
+  type                = 'personal'
+  unencrypted         = true
+  encrypted           = true
+  encryption_password = 'a-strong-export-password'
+  attachments         = true
+
+  # Uncomment to also back up an organization this account belongs to.
+  # [[vault.export]]
+  # type                = 'organization'
+  # organization_id     = '00000000-0000-0000-0000-000000000000'
+  # unencrypted         = true
+  # encrypted           = true
+  # encryption_password = 'a-strong-export-password'
+  # attachments         = true
+
+
+# A second account, e.g. a family member's vault. Delete if not needed.
+[[vault]]
+name            = 'Family member'
+client_id       = 'user.00000000-0000-0000-0000-000000000000'
+client_secret   = 'their-client-secret'
+master_password = 'their-master-password'
+
+  [[vault.export]]
+  type        = 'personal'
+  unencrypted = true
+  encrypted   = false
+  attachments = true
